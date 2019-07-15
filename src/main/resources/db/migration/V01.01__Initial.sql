@@ -13,7 +13,7 @@ CREATE TABLE bank_account (
 	id bigserial NOT NULL PRIMARY KEY,
 	iban text NULL,
 	current_balance decimal NOT NULL,
-	customer_id bigint,
+	customer_id bigint NOT NULL,
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL
 );
@@ -25,7 +25,7 @@ CREATE TABLE card (
 	holder_name text NOT NULL,
     expiry_date text NOT NULL,
 	cvv text NULL,
-	bank_account_id bigint,
+	bank_account_id bigint NOT NULL,
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL
 );

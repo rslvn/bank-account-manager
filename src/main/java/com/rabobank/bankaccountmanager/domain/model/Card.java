@@ -50,7 +50,7 @@ public class Card {
 
     private String cvv;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_account_id")
     private BankAccount bankAccount;
 

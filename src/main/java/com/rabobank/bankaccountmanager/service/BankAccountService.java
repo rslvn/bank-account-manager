@@ -2,9 +2,11 @@ package com.rabobank.bankaccountmanager.service;
 
 import com.google.common.base.Preconditions;
 import com.rabobank.bankaccountmanager.domain.model.BankAccount;
+import com.rabobank.bankaccountmanager.domain.model.Card;
 import com.rabobank.bankaccountmanager.domain.model.Customer;
 import com.rabobank.bankaccountmanager.exception.BankAccountManagerException;
 import com.rabobank.bankaccountmanager.repository.BankAccountRepository;
+import com.rabobank.bankaccountmanager.repository.CardRepository;
 import com.rabobank.bankaccountmanager.util.FormatterUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ public class BankAccountService {
 
 
     private BankAccountRepository bankAccountRepository;
+    private CardRepository cardRepository;
     private CustomerService customerService;
 
     public BankAccount addBankAccount(Long customerId, BankAccount bankAccount) {
@@ -35,11 +38,17 @@ public class BankAccountService {
 
         Customer customer = customerService.getCustomer(customerId);
         bankAccount.setCustomer(customer);
-        bankAccount.getCard().setHolderName(FormatterUtil.getCardHolderName(customer));
 
+        Card card =  bankAccount.getCard();
+        card.setHolderName(FormatterUtil.getCardHolderName(customer));
 
+        // a workaround
+        bankAccount.setCard(null);
         BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
         LOG.info("A bank account saved for customer: {}", customerId);
+
+        card.setBankAccount(savedBankAccount);
+        cardRepository.save(card);
 
         return savedBankAccount;
     }
