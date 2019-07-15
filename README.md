@@ -8,9 +8,9 @@ The transfer can be with debit card or credit card. If a credit card is used, ex
 - It should be possible to transfer and withdraw money from an account. It is possible to pay
   with either debit card or credit card. If a transfer/withdraw is done with a credit card, 1% of the amount is charged extra. Use design patterns where
   applicable and write some test cases as well.
-    - `TransferControllerIT` and `WithdrawControllerIT` is creted to test the requirement. And also `fee` `amount` `totalAmount` `beforeBalance` `afterBalance` fields are visible to see the amount changes by a transaction  in `transaction_history` 
+    - `TransferControllerIT` and `WithdrawControllerIT` is created to test the requirement. And also `fee` `amount` `totalAmount` `beforeBalance` `afterBalance` fields are visible to see the amount changes by a transaction  in `transaction_history` 
 - A negative balance is not possible
-    - `InsufficientBalanceException` created to manage neagtive of possible negative balances
+    - `InsufficientBalanceException` created to manage negative or possible negative balances
 - Account should contain at least some user details, card details and current balance
     - All models are placed in `com.rabobank.bankaccountmanager.domain` package
 - One rest endpoint to see current available balance in all accounts
@@ -18,7 +18,7 @@ The transfer can be with debit card or credit card. If a credit card is used, ex
 - One rest endpoint to withdraw money
     - `WithdrawController.withdraw`
 - One rest endpoint to transfer money
-    - `TransferController.withdraw`
+    - `TransferController.transfer`
 - One credit card or debit card is linked with one account
     - See the `@OneToOne` relation on database
 - It should be able to audit transfers or withdrawals
@@ -70,7 +70,7 @@ testcontainers and postgresql docker is used in integration test. First of all, 
         testImplementation 'org.testcontainers:testcontainers:1.11.4'
         testImplementation 'org.testcontainers:postgresql:1.11.4'
 
-All integration tests run with `integration` spring profile. The profile inserts test data to database.
+All integration tests run with `test` spring profile. The profile inserts test data to database.
 
 ## build
     gradle clean build
