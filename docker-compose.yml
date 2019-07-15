@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  mongodb:
+    image: postgres:9.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres
+    restart: always
+
+  backend:
+    build: ./
+    container_name: bank-account-manager
+    ports:
+      - "8080:8080"
+    restart: always
