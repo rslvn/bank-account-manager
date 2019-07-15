@@ -1,4 +1,4 @@
-# best-package
+# bank-account-manager
 
 This application is a simple bank account implementation. An account able to withdraw money and transfer money to another account.
 The transfer can be with debit card or credit card. If a credit card is used, extra %1 transaction fee is charged. An account can linked with a credit card or bank account.
