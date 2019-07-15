@@ -78,7 +78,7 @@ public class BankAccountRepositoryIT {
         bankAccountRepository.findAll().forEach(bankAccount1 -> System.out.println(bankAccount1));
 
 
-        Card savedCard =  cardRepository.save(card);
+        Card savedCard = cardRepository.save(card);
         System.out.println(savedCard);
 
 

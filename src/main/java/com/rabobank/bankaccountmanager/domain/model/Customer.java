@@ -6,13 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -61,6 +59,6 @@ public class Customer {
     private Date updatedAt;
 
     @ToString.Exclude
-    @OneToOne(optional = false,cascade = ALL, mappedBy = "customer", fetch = FetchType.LAZY)
+    @OneToOne(optional = false, cascade = ALL, mappedBy = "customer", fetch = FetchType.LAZY)
     private BankAccount bankAccount;
 }

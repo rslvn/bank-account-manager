@@ -39,7 +39,7 @@ public class BankAccountService {
         Customer customer = customerService.getCustomer(customerId);
         bankAccount.setCustomer(customer);
 
-        Card card =  bankAccount.getCard();
+        Card card = bankAccount.getCard();
         card.setHolderName(FormatterUtil.getCardHolderName(customer));
 
         // a workaround

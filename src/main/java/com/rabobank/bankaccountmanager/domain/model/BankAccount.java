@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,8 +21,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import static javax.persistence.CascadeType.ALL;
 
 /**
  * bank_account table java object
@@ -58,6 +54,6 @@ public class BankAccount {
     @LastModifiedDate
     private Date updatedAt;
 
-    @OneToOne(optional = false,cascade = CascadeType.ALL,mappedBy = "bankAccount", fetch = FetchType.LAZY)
+    @OneToOne(optional = false, cascade = CascadeType.ALL, mappedBy = "bankAccount", fetch = FetchType.LAZY)
     private Card card;
 }

@@ -1,7 +1,5 @@
 package com.rabobank.bankaccountmanager.util;
 
-import com.google.common.base.Preconditions;
-
 import java.math.BigDecimal;
 
 public class ValidationUtil {
