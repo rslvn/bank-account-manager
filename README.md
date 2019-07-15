@@ -42,6 +42,8 @@ The transfer can be with debit card or credit card. If a credit card is used, ex
 
 find all endpoint details: [api-docs](http://localhost:8080/swagger-ui.html) after running application
 
+![API view on Swagger](./doc/APIs-Swagger.png)
+
 ### tests
 
 The unit and integration test package is same. The name of the unit test classes ends with `Test`; The name of the integration test class ends with 'IT'.
