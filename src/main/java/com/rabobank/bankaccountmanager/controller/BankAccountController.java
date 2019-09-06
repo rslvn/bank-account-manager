@@ -38,13 +38,13 @@ public class BankAccountController {
 
     public static final String SERVICE_PATH = "api/bank/account";
     public static final String METHOD_GET_BALANCE = "/balance";
-    public static final String METHOD_GET_BALANCE_WITH_PARAM = "/balance/{bankAccountId}";
+    private static final String METHOD_GET_BALANCE_WITH_PARAM = "/balance/{bankAccountId}";
     public static final String METHOD_GET_BALANCE_ALL = "/balance/all";
 
     private BankAccountService bankAccountService;
     private ConversionService conversionService;
 
-    @ApiOperation(value = "Create a new bank account with a credit card or debit card")
+    @ApiOperation(value = "Create a new bank account with a credit card or debit card by given customerId")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 400, message = "Bad Request."),
@@ -64,7 +64,7 @@ public class BankAccountController {
         bankAccountService.addBankAccount(customerId, bankAccount);
     }
 
-    @ApiOperation(value = "Retrieves the current balance of all bank accounts", response = BalanceDto.class, responseContainer = "List")
+    @ApiOperation(value = "Retrieves the current balances of all bank accounts", response = BalanceDto.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK."),
             @ApiResponse(code = 400, message = "Bad Request."),

@@ -26,7 +26,6 @@ public class BankAccountService {
 
     private static final String MESSAGE_FORMAT_NO_BANK_ACCOUNT = "No bankAccount by bankAccountId: %s";
 
-
     private BankAccountRepository bankAccountRepository;
     private CardRepository cardRepository;
     private CustomerService customerService;

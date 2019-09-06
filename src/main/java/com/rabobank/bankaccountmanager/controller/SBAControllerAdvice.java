@@ -38,6 +38,10 @@ public class SBAControllerAdvice extends ResponseEntityExceptionHandler {
         LOG.error("HttpStatus.BAD_REQUEST", e);
     }
 
+    /**
+     *  handle other exceptions
+     * @param e the exception
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     protected void handleGeneric(Exception e) {

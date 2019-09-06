@@ -1,6 +1,7 @@
 package com.rabobank.bankaccountmanager.service;
 
 import com.rabobank.bankaccountmanager.TestDataUtils;
+import com.rabobank.bankaccountmanager.domain.event.TransactionHistorySaveEvent;
 import com.rabobank.bankaccountmanager.domain.model.BankAccount;
 import com.rabobank.bankaccountmanager.domain.type.TransactionType;
 import com.rabobank.bankaccountmanager.exception.InsufficientBalanceManagerException;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.concurrent.ExecutorService;
@@ -20,14 +22,15 @@ public class TransactionServiceTest {
 
     @Mock
     private ValidationService validationService;
+
     @Mock
     private BankAccountService bankAccountService;
+
     @Mock
     private TransactionFeeService transactionFeeService;
+
     @Mock
-    private TransactionHistoryRepository transactionHistoryRepository;
-    @Mock
-    private ExecutorService executorService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private TransactionService transactionService;
@@ -55,7 +58,7 @@ public class TransactionServiceTest {
 
         transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = InsufficientBalanceManagerException.class)
@@ -77,7 +80,7 @@ public class TransactionServiceTest {
 
         transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = RuntimeException.class)
@@ -99,7 +102,7 @@ public class TransactionServiceTest {
 
         transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = RuntimeException.class)
@@ -118,11 +121,11 @@ public class TransactionServiceTest {
                 .thenReturn(bankAccount);
 
         Mockito.doThrow(new RuntimeException()).when(validationService).validateCurrentBalance(bankAccount);
-        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
+//        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
 
         transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
 
@@ -152,7 +155,7 @@ public class TransactionServiceTest {
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test
@@ -178,11 +181,11 @@ public class TransactionServiceTest {
         Mockito.when(bankAccountService.increaseCurrentBalance(toBankAccount, BigDecimal.ONE))
                 .thenReturn(toBankAccount);
 
-        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
+//        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = InsufficientBalanceManagerException.class)
@@ -210,7 +213,7 @@ public class TransactionServiceTest {
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = RuntimeException.class)
@@ -238,6 +241,6 @@ public class TransactionServiceTest {
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(executorService, Mockito.times(1)).submit(Mockito.any(TransactionHistoryInserter.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 }

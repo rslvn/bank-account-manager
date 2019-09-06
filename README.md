@@ -28,6 +28,7 @@ The transfer can be with debit card or credit card. If a credit card is used, ex
 - JDK1.8
 - gradle
 - docker
+- docker-compose
 
 ### stacks
 - Spring Boot

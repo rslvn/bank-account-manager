@@ -1,6 +1,7 @@
 package com.rabobank.bankaccountmanager.service;
 
 import com.google.common.base.Preconditions;
+import com.rabobank.bankaccountmanager.domain.event.TransactionHistorySaveEvent;
 import com.rabobank.bankaccountmanager.domain.model.BankAccount;
 import com.rabobank.bankaccountmanager.domain.model.TransactionHistory;
 import com.rabobank.bankaccountmanager.domain.type.StatementType;
@@ -8,16 +9,16 @@ import com.rabobank.bankaccountmanager.domain.type.TransactionStatus;
 import com.rabobank.bankaccountmanager.domain.type.TransactionType;
 import com.rabobank.bankaccountmanager.exception.InsufficientBalanceManagerException;
 import com.rabobank.bankaccountmanager.repository.TransactionHistoryRepository;
-import com.rabobank.bankaccountmanager.task.TransactionHistoryInserter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 /**
  * Transaction management service as TRANSFER and WITHDRAW
@@ -34,6 +35,7 @@ public class TransactionService {
     private TransactionFeeService transactionFeeService;
     private TransactionHistoryRepository transactionHistoryRepository;
     private ExecutorService executorService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public void executeWithdraw(BankAccount bankAccount, BigDecimal amount) {
         // validate parameters
@@ -58,7 +60,7 @@ public class TransactionService {
             throw e;
 
         } finally {
-            insertTransactionHistory(transactionHistoryBuilder);
+            sendTransactionHistorySaveEvent(transactionHistoryBuilder);
         }
     }
 
@@ -70,7 +72,7 @@ public class TransactionService {
         Preconditions.checkArgument(!Objects.equals(fromBankAccount.getId(), toBankAccount.getId()),
                 "Transfer can not executed an account to the same account. bankAccountId: ",
                 fromBankAccount.getId());
-        validationService.validAmount(amount);
+
 
         // create TransactionHistoryBuilder for fromBankAccount
         TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder = getTransactionHistoryBuilder(
@@ -87,6 +89,8 @@ public class TransactionService {
                 amount);
 
         try {
+            validationService.validAmount(amount);
+
             takeMoney(fromTransactionHistoryBuilder, fromBankAccount, amount);
             putMoney(toTransactionHistoryBuilder, toBankAccount, amount);
 
@@ -101,7 +105,7 @@ public class TransactionService {
             throw e;
 
         } finally {
-            insertTransactionHistory(fromTransactionHistoryBuilder, toTransactionHistoryBuilder);
+            sendTransactionHistorySaveEvent(fromTransactionHistoryBuilder, toTransactionHistoryBuilder);
         }
     }
 
@@ -155,42 +159,19 @@ public class TransactionService {
                 .failingReason(failingReason);
     }
 
-    private void insertTransactionHistory(TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder) {
+    private void sendTransactionHistorySaveEvent(TransactionHistory.TransactionHistoryBuilder... transactionHistoryBuilder) {
+        Arrays.asList(transactionHistoryBuilder).forEach(this::sendTransactionHistorySaveEvent);
+    }
+
+    private void sendTransactionHistorySaveEvent(TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder) {
         try {
-            Future<String> future = executorService.submit(TransactionHistoryInserter.builder()
+            applicationEventPublisher.publishEvent(TransactionHistorySaveEvent.builder()
                     .fromTransactionHistory(transactionHistoryBuilder.build())
-                    .transactionHistoryRepository(transactionHistoryRepository)
+                    .eventSource(getClass().getName())
                     .build());
-
-            waitForFuture(future);
         } catch (Exception e) {
             LOG.error(ERROR_CREATING_INSERTER, e);
         }
-    }
-
-    private void insertTransactionHistory(TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder,
-                                          TransactionHistory.TransactionHistoryBuilder toTransactionHistoryBuilder) {
-        try {
-            Future<String> future = executorService.submit(TransactionHistoryInserter.builder()
-                    .fromTransactionHistory(fromTransactionHistoryBuilder.build())
-                    .toTransactionHistory(toTransactionHistoryBuilder.build())
-                    .transactionHistoryRepository(transactionHistoryRepository)
-                    .build());
-
-            waitForFuture(future);
-        } catch (Exception e) {
-            LOG.error(ERROR_CREATING_INSERTER, e);
-        }
-    }
-
-    private void waitForFuture(Future<String> future) throws Exception {
-
-        while (true) {
-            if (future.get() != null) {
-                break;
-            }
-        }
-
     }
 
 }

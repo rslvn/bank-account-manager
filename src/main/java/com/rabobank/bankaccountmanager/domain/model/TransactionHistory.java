@@ -14,9 +14,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -30,15 +33,17 @@ import java.util.Date;
 @Entity
 @Table(name = "transaction_history")
 @EntityListeners(AuditingEntityListener.class)
-public class TransactionHistory {
+public class TransactionHistory implements Serializable {
 
     @Id
     @GenericGenerator(name = "transaction_generator", strategy = "increment")
     @GeneratedValue(generator = "transaction_generator")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private TransactionType type;
 
+    @Enumerated(EnumType.STRING)
     private StatementType statementType;
 
     private Long customerId;
@@ -59,6 +64,7 @@ public class TransactionHistory {
 
     private Long correlationId;
 
+    @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
     private String failingReason;

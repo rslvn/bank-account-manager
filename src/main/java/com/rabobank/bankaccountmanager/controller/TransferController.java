@@ -43,11 +43,10 @@ public class TransferController {
     })
     @PostMapping(value = "{fromBankAccountId}/{toBankAccountId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void withdraw(@ApiParam(value = "The ID of the from bank account") @PathVariable(name = "fromBankAccountId") Long fromBankAccountId,
+    public void transfer(@ApiParam(value = "The ID of the from bank account") @PathVariable(name = "fromBankAccountId") Long fromBankAccountId,
                          @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "toBankAccountId") Long toBankAccountId,
                          @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
         LOG.info("/{}/{}/{} called with amount: {}", SERVICE_PATH, fromBankAccountId, toBankAccountId, amountDto);
-        Preconditions.checkNotNull(amountDto, "amountDto can not be null");
 
         transferService.transfer(fromBankAccountId, toBankAccountId, amountDto.getAmount());
     }

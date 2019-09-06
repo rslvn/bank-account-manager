@@ -72,7 +72,7 @@ public class CustomerController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation(value = "Retrieve account by given customerId", response = CustomerDto.class)
+    @ApiOperation(value = "Retrieve customer by given customerId", response = CustomerDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK."),
             @ApiResponse(code = 400, message = "Bad Request."),
