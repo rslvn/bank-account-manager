@@ -8,7 +8,6 @@ import com.rabobank.bankaccountmanager.domain.type.StatementType;
 import com.rabobank.bankaccountmanager.domain.type.TransactionStatus;
 import com.rabobank.bankaccountmanager.domain.type.TransactionType;
 import com.rabobank.bankaccountmanager.exception.InsufficientBalanceManagerException;
-import com.rabobank.bankaccountmanager.repository.TransactionHistoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
+import java.util.Optional;
 
 /**
  * Transaction management service as TRANSFER and WITHDRAW
@@ -33,8 +31,6 @@ public class TransactionService {
     private ValidationService validationService;
     private BankAccountService bankAccountService;
     private TransactionFeeService transactionFeeService;
-    private TransactionHistoryRepository transactionHistoryRepository;
-    private ExecutorService executorService;
     private ApplicationEventPublisher applicationEventPublisher;
 
     public void executeWithdraw(BankAccount bankAccount, BigDecimal amount) {
@@ -60,7 +56,7 @@ public class TransactionService {
             throw e;
 
         } finally {
-            sendTransactionHistorySaveEvent(transactionHistoryBuilder);
+            sendTransactionHistorySaveEvent(transactionHistoryBuilder, Optional.empty());
         }
     }
 
@@ -72,7 +68,6 @@ public class TransactionService {
         Preconditions.checkArgument(!Objects.equals(fromBankAccount.getId(), toBankAccount.getId()),
                 "Transfer can not executed an account to the same account. bankAccountId: ",
                 fromBankAccount.getId());
-
 
         // create TransactionHistoryBuilder for fromBankAccount
         TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder = getTransactionHistoryBuilder(
@@ -105,7 +100,7 @@ public class TransactionService {
             throw e;
 
         } finally {
-            sendTransactionHistorySaveEvent(fromTransactionHistoryBuilder, toTransactionHistoryBuilder);
+            sendTransactionHistorySaveEvent(fromTransactionHistoryBuilder, Optional.of(toTransactionHistoryBuilder));
         }
     }
 
@@ -159,19 +154,24 @@ public class TransactionService {
                 .failingReason(failingReason);
     }
 
-    private void sendTransactionHistorySaveEvent(TransactionHistory.TransactionHistoryBuilder... transactionHistoryBuilder) {
-        Arrays.asList(transactionHistoryBuilder).forEach(this::sendTransactionHistorySaveEvent);
+    private void sendTransactionHistorySaveEvent(TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder,
+                                                 Optional<TransactionHistory.TransactionHistoryBuilder> toTransactionHistoryBuilderOptional) {
+
+        TransactionHistorySaveEvent.TransactionHistorySaveEventBuilder builder = TransactionHistorySaveEvent.builder()
+                .fromTransactionHistory(fromTransactionHistoryBuilder.build())
+                .eventSource(getClass().getName());
+
+        toTransactionHistoryBuilderOptional.ifPresent(toTransactionHistoryBuilder ->
+                builder.toTransactionHistory(toTransactionHistoryBuilder.build()));
+
+        sendTransactionHistorySaveEvent(builder.build());
     }
 
-    private void sendTransactionHistorySaveEvent(TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder) {
+    private void sendTransactionHistorySaveEvent(TransactionHistorySaveEvent transactionHistorySaveEvent) {
         try {
-            applicationEventPublisher.publishEvent(TransactionHistorySaveEvent.builder()
-                    .fromTransactionHistory(transactionHistoryBuilder.build())
-                    .eventSource(getClass().getName())
-                    .build());
+            applicationEventPublisher.publishEvent(transactionHistorySaveEvent);
         } catch (Exception e) {
             LOG.error(ERROR_CREATING_INSERTER, e);
         }
     }
-
 }

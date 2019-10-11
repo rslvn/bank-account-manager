@@ -28,7 +28,7 @@ public class TestDataUtils {
     public static final Long CUSTOMER_ID_FOR_NEW_BANK_ACCOUNT = 1L;
 
     public static final Long BANK_ACCOUNT_DEBIT = 1L;
-    public static final Long BANK_ACCOUNT_CREADIT = 2L;
+    public static final Long BANK_ACCOUNT_CREDIT = 2L;
     public static final Long BANK_ACCOUNT_DEBIT_NO_LIMIT = 3L;
     public static final Long BANK_ACCOUNT_CREADIT_NO_LIMIT = 4L;
 

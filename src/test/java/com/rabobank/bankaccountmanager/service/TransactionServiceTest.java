@@ -4,9 +4,8 @@ import com.rabobank.bankaccountmanager.TestDataUtils;
 import com.rabobank.bankaccountmanager.domain.event.TransactionHistorySaveEvent;
 import com.rabobank.bankaccountmanager.domain.model.BankAccount;
 import com.rabobank.bankaccountmanager.domain.type.TransactionType;
+import com.rabobank.bankaccountmanager.exception.BankAccountManagerException;
 import com.rabobank.bankaccountmanager.exception.InsufficientBalanceManagerException;
-import com.rabobank.bankaccountmanager.repository.TransactionHistoryRepository;
-import com.rabobank.bankaccountmanager.task.TransactionHistoryInserter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -16,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
-import java.util.concurrent.ExecutorService;
 
 public class TransactionServiceTest {
 
@@ -121,7 +119,6 @@ public class TransactionServiceTest {
                 .thenReturn(bankAccount);
 
         Mockito.doThrow(new RuntimeException()).when(validationService).validateCurrentBalance(bankAccount);
-//        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
 
         transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
@@ -138,7 +135,7 @@ public class TransactionServiceTest {
         fromBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
         BankAccount toBankAccount = TestDataUtils.getBankAccount1();
-        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREADIT);
+        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREDIT);
         toBankAccount.setCard(TestDataUtils.getDebitCard1());
         toBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
@@ -155,7 +152,7 @@ public class TransactionServiceTest {
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test
@@ -167,7 +164,7 @@ public class TransactionServiceTest {
         fromBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
         BankAccount toBankAccount = TestDataUtils.getBankAccount1();
-        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREADIT);
+        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREDIT);
         toBankAccount.setCard(TestDataUtils.getDebitCard1());
         toBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
@@ -181,11 +178,9 @@ public class TransactionServiceTest {
         Mockito.when(bankAccountService.increaseCurrentBalance(toBankAccount, BigDecimal.ONE))
                 .thenReturn(toBankAccount);
 
-//        Mockito.doThrow(new RuntimeException()).when(executorService).submit(Mockito.any(TransactionHistoryInserter.class));
-
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
 
-        Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }
 
     @Test(expected = InsufficientBalanceManagerException.class)
@@ -197,7 +192,7 @@ public class TransactionServiceTest {
         fromBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
         BankAccount toBankAccount = TestDataUtils.getBankAccount1();
-        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREADIT);
+        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREDIT);
         toBankAccount.setCard(TestDataUtils.getDebitCard1());
         toBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
@@ -225,7 +220,7 @@ public class TransactionServiceTest {
         fromBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
         BankAccount toBankAccount = TestDataUtils.getBankAccount1();
-        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREADIT);
+        toBankAccount.setId(TestDataUtils.BANK_ACCOUNT_CREDIT);
         toBankAccount.setCard(TestDataUtils.getDebitCard1());
         toBankAccount.setCustomer(TestDataUtils.getCustomer1());
 
@@ -240,6 +235,27 @@ public class TransactionServiceTest {
                 .thenThrow(new RuntimeException("put money runtime"));
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, BigDecimal.ONE);
+
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
+    }
+
+    @Test
+    public void eventCannotSentTest() {
+        BankAccount bankAccount = TestDataUtils.getBankAccount1();
+        bankAccount.setCard(TestDataUtils.getDebitCard1());
+        bankAccount.setCustomer(TestDataUtils.getCustomer1());
+
+        Mockito.when(transactionFeeService.getFee(TransactionType.WITHDRAW, bankAccount, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ZERO);
+        Mockito.when(transactionFeeService.getTotalAmount(BigDecimal.ONE, BigDecimal.ZERO))
+                .thenReturn(BigDecimal.ONE);
+
+        Mockito.when(bankAccountService.decreaseCurrentBalance(bankAccount, BigDecimal.ONE))
+                .thenReturn(bankAccount);
+        Mockito.doThrow(BankAccountManagerException.to("CannotSentTest"))
+                .when(applicationEventPublisher).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
+
+        transactionService.executeWithdraw(bankAccount, BigDecimal.ONE);
 
         Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(Mockito.any(TransactionHistorySaveEvent.class));
     }

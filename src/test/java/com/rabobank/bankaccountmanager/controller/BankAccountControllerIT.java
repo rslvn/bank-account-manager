@@ -1,27 +1,23 @@
 package com.rabobank.bankaccountmanager.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.rabobank.bankaccountmanager.AbstractTestContainer;
 import com.rabobank.bankaccountmanager.TestDataUtils;
 import com.rabobank.bankaccountmanager.domain.dto.BalanceDto;
 import com.rabobank.bankaccountmanager.domain.dto.BankAccountDto;
 import com.rabobank.bankaccountmanager.domain.dto.CardDto;
 import org.junit.Assert;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.List;
 
@@ -30,18 +26,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(initializers = {BankAccountControllerIT.Initializer.class})
+@ContextConfiguration(initializers = {AbstractTestContainer.Initializer.class})
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles(profiles = "test")
 public class BankAccountControllerIT {
 
-    @ClassRule
-    public static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres")
-            .withDatabaseName("postgres")
-            .withUsername("postgres")
-            .withPassword("postgres");
+//    @ClassRule
+//    public static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres")
+//            .withDatabaseName("postgres")
+//            .withUsername("postgres")
+//            .withPassword("postgres");
 
     @Autowired
     private MockMvc mvc;
@@ -179,15 +175,15 @@ public class BankAccountControllerIT {
                 );
     }
 
-    static class Initializer
-            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            TestPropertyValues.of(
-                    "spring.datasource.url=" + postgres.getJdbcUrl(),
-                    "spring.datasource.username=" + postgres.getUsername(),
-                    "spring.datasource.password=" + postgres.getPassword()
-            ).applyTo(configurableApplicationContext.getEnvironment());
-        }
-    }
+//    static class Initializer
+//            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+//        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+//            TestPropertyValues.of(
+//                    "spring.datasource.url=" + postgres.getJdbcUrl(),
+//                    "spring.datasource.username=" + postgres.getUsername(),
+//                    "spring.datasource.password=" + postgres.getPassword()
+//            ).applyTo(configurableApplicationContext.getEnvironment());
+//        }
+//    }
 
 }

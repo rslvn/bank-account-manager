@@ -5,7 +5,7 @@ package com.rabobank.bankaccountmanager.exception;
  */
 public class InsufficientBalanceManagerException extends BankAccountManagerException {
 
-    public InsufficientBalanceManagerException(String format, Object... parameters) {
+    private InsufficientBalanceManagerException(String format, Object... parameters) {
         super(format, parameters);
     }
 

@@ -36,4 +36,7 @@ dependencies {
     testImplementation 'pl.pojo:pojo-tester:0.7.6'
     testImplementation 'org.testcontainers:testcontainers:1.11.4'
     testImplementation 'org.testcontainers:postgresql:1.11.4'
+
+    testCompile 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }

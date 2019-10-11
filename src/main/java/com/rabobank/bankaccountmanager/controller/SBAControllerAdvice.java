@@ -39,7 +39,8 @@ public class SBAControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
-     *  handle other exceptions
+     * handle other exceptions
+     *
      * @param e the exception
      */
     @ExceptionHandler(Exception.class)

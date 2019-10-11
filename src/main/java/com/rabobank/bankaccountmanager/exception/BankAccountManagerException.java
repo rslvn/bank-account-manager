@@ -5,11 +5,11 @@ package com.rabobank.bankaccountmanager.exception;
  */
 public class BankAccountManagerException extends RuntimeException {
 
-    public BankAccountManagerException(String format, Object... parameters) {
+    protected BankAccountManagerException(String format, Object... parameters) {
         super(String.format(format, parameters));
     }
 
-    public BankAccountManagerException(Throwable cause, String format, Object... parameters) {
+    protected BankAccountManagerException(Throwable cause, String format, Object... parameters) {
         super(String.format(format, parameters), cause);
     }
 

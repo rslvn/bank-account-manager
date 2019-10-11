@@ -1,30 +1,35 @@
-package com.rabobank.bankaccountmanager.task;
+package com.rabobank.bankaccountmanager.event;
 
+import com.rabobank.bankaccountmanager.domain.event.TransactionHistorySaveEvent;
 import com.rabobank.bankaccountmanager.domain.model.TransactionHistory;
 import com.rabobank.bankaccountmanager.exception.BankAccountManagerException;
 import com.rabobank.bankaccountmanager.repository.TransactionHistoryRepository;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
-/**
- * Transaction history writer
- */
 @Slf4j
-@Builder
-public class TransactionHistoryInserter implements Callable<String> {
+@AllArgsConstructor(onConstructor_ = {@Autowired})
+@Component
+public class SBAEventListener {
 
     private TransactionHistoryRepository transactionHistoryRepository;
-    private TransactionHistory fromTransactionHistory;
-    private TransactionHistory toTransactionHistory;
 
-    @Override
-    public String call() {
+    @Async
+    @EventListener
+    public void handleTransactionHistorySaveEvent(TransactionHistorySaveEvent transactionHistorySaveEvent) {
         try {
+            TransactionHistory fromTransactionHistory = transactionHistorySaveEvent.getFromTransactionHistory();
+            TransactionHistory toTransactionHistory = transactionHistorySaveEvent.getToTransactionHistory();
+
             TransactionHistory savedFromTransactionHistory = transactionHistoryRepository.save(fromTransactionHistory);
             LOG.info("fromTransactionHistory is written. {}", savedFromTransactionHistory);
+
             Optional.ofNullable(toTransactionHistory).ifPresent(transactionHistory -> {
                 // set correlationIds from savedFromTransactionHistory
                 transactionHistory.setCorrelationId(savedFromTransactionHistory.getId());
@@ -38,9 +43,11 @@ public class TransactionHistoryInserter implements Callable<String> {
                 transactionHistoryRepository.save(savedFromTransactionHistory);
 
             });
-        } catch (Exception e) {
+        } catch (BankAccountManagerException e) {
+            LOG.error("", e);
+        }
+        catch (Exception e) {
             LOG.error("", BankAccountManagerException.to(e, "Error while inserting TransactionHistory"));
         }
-        return "OK";
     }
 }
