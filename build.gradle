@@ -46,7 +46,8 @@ dependencies {
 sonarqube {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.sources", "src"
+        property "sonar.sources", "src/main/java"
+        property "sonar.sources", "**/target/classes"
     }
 }
 
