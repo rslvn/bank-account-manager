@@ -1,11 +1,11 @@
 plugins {
     id 'org.springframework.boot' version '2.1.6.RELEASE'
     id 'java'
-    id "org.sonarqube" version "2.7.1"
+    id 'jacoco'
+    id 'org.sonarqube' version '3.0'
 }
 
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'jacoco'
 
 group = 'com.rabobank'
 version = '0.0.1'
@@ -42,3 +42,11 @@ dependencies {
     testCompile 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+test.finalizedBy jacocoTestReport
+tasks['sonarqube'].dependsOn test
