@@ -3,9 +3,10 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-machine: true
 jobs:
   build:
+    machine:
+      image: ubuntu-1604:202004-01
 
     working_directory: ~/repo
 
