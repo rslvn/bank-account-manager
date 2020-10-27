@@ -1,5 +1,6 @@
 # bank-account-manager
 
+[![CircleCI](https://circleci.com/gh/rslvn/bank-account-manager.svg?style=svg)](https://circleci.com/gh/rslvn/bank-account-manager)
 [![Coverage Code](https://sonarcloud.io/api/project_badges/measure?project=rslvn_bank-account-manager&metric=coverage)](https://sonarcloud.io/dashboard?id=rslvn_bank-account-manager)
 [![Lines Of Code](https://sonarcloud.io/api/project_badges/measure?project=rslvn_bank-account-manager&metric=ncloc)](https://sonarcloud.io/dashboard?id=rslvn_bank-account-manager)
 [![Technical Debit](https://sonarcloud.io/api/project_badges/measure?project=rslvn_bank-account-manager&metric=sqale_index)](https://sonarcloud.io/dashboard?id=rslvn_bank-account-manager)
