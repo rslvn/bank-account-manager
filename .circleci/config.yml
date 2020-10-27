@@ -46,6 +46,7 @@ jobs:
           command: gradle build sonarqube"
 
 workflows:
+  version: 2
   main:
     jobs:
       - build:
