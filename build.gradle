@@ -6,6 +6,8 @@ plugins {
 }
 
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
 
 group = 'com.rabobank'
 version = '0.0.1'
