@@ -43,9 +43,18 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.sources", "src"
+    }
+}
+
 jacocoTestReport {
     reports {
         xml.enabled true
+        csv.enabled false
+        html.enabled false
     }
 }
 test.finalizedBy jacocoTestReport
