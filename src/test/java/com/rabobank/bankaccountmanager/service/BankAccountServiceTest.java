@@ -28,7 +28,6 @@ public class BankAccountServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
-
     @Test
     public void testIncreaseCurrentBalance() {
         BankAccount bankAccount = BankAccount.builder().id(1L).currentBalance(BigDecimal.ONE).build();
